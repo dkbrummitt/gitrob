@@ -1,9 +1,9 @@
-module dkbrummitt/gitrob
+module github.com/dkbrummitt/gitrob
 
 go 1.13
 
 require (
-	github.com/dkbrummitt/gitrob v1.0.1
+	github.com/dkbrummitt/gitrob v1.0.2
 	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/fatih/color v1.7.0
 	github.com/gin-contrib/secure v0.0.0-20191128031426-fb27c292757f
