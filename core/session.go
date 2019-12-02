@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-github/github"
+	// "github.com/google/go-github/github"
 
-	// "github.com/google/go-github/v28/github"
+	"github.com/google/go-github/v28/github"
 	"golang.org/x/oauth2"
 )
 
