@@ -24,7 +24,7 @@ func GatherTargets(sess *core.Session) {
 			sess.Out.Error(" Error retrieving information on %s: %s\n", login, err)
 			continue
 		}
-		sess.Out.Debug("%s (ID: %d) type: %s\n", *target.Login, *target.ID, *target.Type)
+		sess.Out.Debug("Target %s (ID: %d) type: %s\n", *target.Login, *target.ID, *target.Type)
 		sess.AddTarget(target)
 		if *sess.Options.NoExpandOrgs == false && *target.Type == "Organization" {
 			sess.Out.Debug("Gathering members of %s (ID: %d)...\n", *target.Login, *target.ID)
@@ -151,12 +151,19 @@ func AnalyzeRepositories(sess *core.Session) {
 						sess.Out.Debug("[THREAD #%d][%s] Matching: %s...\n", tid, *repo.FullName, matchFile.Path)
 						for _, signature := range core.Signatures {
 							if signature.Match(matchFile) {
-
+								lineNums := ":"
+								cmt := signature.Comment()
+								if len(signature.Matches()) > 0 {
+									for _, m := range signature.Matches() {
+										lineNums = lineNums + fmt.Sprintf("%d", m.LineNumber) + ","
+									}
+									cmt = cmt + lineNums
+								}
 								finding := &core.Finding{
 									FilePath:        path,
 									Action:          changeAction,
 									Description:     signature.Description(),
-									Comment:         signature.Comment(),
+									Comment:         cmt,
 									RepositoryOwner: *repo.Owner,
 									RepositoryName:  *repo.Name,
 									CommitHash:      commit.Hash.String(),
@@ -176,7 +183,8 @@ func AnalyzeRepositories(sess *core.Session) {
 								}
 								sess.Out.Info("  File URL.......: %s\n", finding.FileUrl)
 								sess.Out.Info("  Commit URL.....: %s\n", finding.CommitUrl)
-								sess.Out.Info("  Content Issues.: %d\n", len(signature.ContentMatches))
+								sess.Out.Info("  Content Issues.: %d\n", len(signature.Matches()))
+								sess.Out.Info("  Line Numbers...: %s\n", lineNums)
 								sess.Out.Info(" ------------------------------------------------\n\n")
 								sess.Stats.IncrementFindings()
 								break

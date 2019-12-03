@@ -90,6 +90,7 @@ type Signature interface {
 	Match(file MatchFile) bool
 	Description() string
 	Comment() string
+	Matches() []ContentMatch
 }
 
 type SimpleSignature struct {
@@ -108,7 +109,7 @@ type PatternSignature struct {
 	ContentMatches []ContentMatch
 }
 
-func (s SimpleSignature) checkContents(file MatchFile) []ContentMatch {
+func (s *SimpleSignature) checkContents(file MatchFile) []ContentMatch {
 	var matches []ContentMatch
 
 	f, err := os.Open(file.Path)
@@ -144,7 +145,9 @@ func (s SimpleSignature) checkContents(file MatchFile) []ContentMatch {
 
 	return matches
 }
-
+func (s SimpleSignature) Matches() []ContentMatch {
+	return s.ContentMatches
+}
 func (s SimpleSignature) Match(file MatchFile) bool {
 	var haystack *string
 	switch s.part {
@@ -182,7 +185,7 @@ type ContentMatch struct {
 	Comment    string
 }
 
-func (s PatternSignature) checkContents(file MatchFile) []ContentMatch {
+func (s *PatternSignature) checkContents(file MatchFile) []ContentMatch {
 	var matches []ContentMatch
 
 	f, err := os.Open(file.Path)
@@ -217,6 +220,9 @@ func (s PatternSignature) checkContents(file MatchFile) []ContentMatch {
 	}
 
 	return matches
+}
+func (s PatternSignature) Matches() []ContentMatch {
+	return s.ContentMatches
 }
 
 func (s PatternSignature) Match(file MatchFile) bool {
@@ -811,31 +817,31 @@ var Signatures = []Signature{
 	PatternSignature{
 		part:        Content,
 		match:       regexp.MustCompile(`password.*=.*`),
-		description: "Contents Contains word: password",
+		description: "File Contents Contain variable setting for: password",
 		comment:     "",
 	},
 	PatternSignature{
 		part:        Content,
 		match:       regexp.MustCompile(`passwd.*=.*`),
-		description: "Contents Contains word: password",
+		description: "File Contents Contain variable setting for: passwd",
 		comment:     "",
 	},
 	PatternSignature{
 		part:        Content,
 		match:       regexp.MustCompile(`pwd.*=.*`),
-		description: "Contents Contains word: password",
+		description: "File Contents Contain variable setting for: pwd",
 		comment:     "",
 	},
 	PatternSignature{
 		part:        Content,
 		match:       regexp.MustCompile(`token.*=.*`),
-		description: "Contents Contains word: password",
+		description: "File Contents Contain variable setting for: token",
 		comment:     "",
 	},
 	PatternSignature{
 		part:        Content,
 		match:       regexp.MustCompile(`key.*=.*`),
-		description: "Contents Contains word: password",
+		description: "File Contents Contain variable setting for: key",
 		comment:     "",
 	},
 }

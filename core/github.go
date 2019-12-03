@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	// "github.com/google/go-github/github"
 	"github.com/google/go-github/v28/github"
@@ -58,8 +59,14 @@ func GetRepositoriesFromOwner(login *string, client *github.Client) ([]*GithubRe
 	var allRepos []*GithubRepository
 	loginVal := *login
 	ctx := context.Background()
+	// listopt := &github.ListOptions{
+	// 	PerPage: 50,
+	// }
+	fmt.Println("Super Secret Squirl")
 	opt := &github.RepositoryListOptions{
-		Type: "sources",
+		// Type: "sources",
+		Visibility: "private",
+		// ListOptions: *listopt,
 	}
 
 	for {
