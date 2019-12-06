@@ -71,3 +71,4 @@ Gitrob will need a Github access token in order to interact with the Github API.
     export GITROB_ACCESS_TOKEN=deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
 
 Alternatively you can specify the access token with the `-github-access-token` option, but watch out for your command history!
+ 
