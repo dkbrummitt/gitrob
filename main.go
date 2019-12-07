@@ -62,8 +62,7 @@ func GatherRepositories(sess *core.Session) {
 					wg.Done()
 					return
 				}
-
-				repos, err := core.GetRepositoriesFromOwner(target.Login, sess.GithubClient, "gosh")
+				repos, err := core.GetRepositoriesFromOwner(target.Login, sess.GithubClient)
 				if err != nil {
 					sess.Out.Error(" Failed to retrieve repositories from %s: %s\n", *target.Login, err)
 				}
@@ -152,12 +151,19 @@ func AnalyzeRepositories(sess *core.Session) {
 						sess.Out.Debug("[THREAD #%d][%s] Matching: %s...\n", tid, *repo.FullName, matchFile.Path)
 						for _, signature := range core.Signatures {
 							if signature.Match(matchFile) {
-
+								lineNums := ":"
+								cmt := signature.Comment()
+								if len(signature.Matches()) > 0 {
+									for _, m := range signature.Matches() {
+										lineNums = lineNums + fmt.Sprintf("%d", m.LineNumber) + ","
+									}
+									cmt = cmt + lineNums
+								}
 								finding := &core.Finding{
 									FilePath:        path,
 									Action:          changeAction,
 									Description:     signature.Description(),
-									Comment:         signature.Comment(),
+									Comment:         cmt,
 									RepositoryOwner: *repo.Owner,
 									RepositoryName:  *repo.Name,
 									CommitHash:      commit.Hash.String(),
@@ -168,15 +174,17 @@ func AnalyzeRepositories(sess *core.Session) {
 								sess.AddFinding(finding)
 
 								sess.Out.Warn(" %s: %s\n", strings.ToUpper(changeAction), finding.Description)
-								sess.Out.Info("  Path.......: %s\n", finding.FilePath)
-								sess.Out.Info("  Repo.......: %s\n", *repo.FullName)
-								sess.Out.Info("  Message....: %s\n", core.TruncateString(finding.CommitMessage, 100))
-								sess.Out.Info("  Author.....: %s\n", finding.CommitAuthor)
+								sess.Out.Info("  Path...........: %s\n", finding.FilePath)
+								sess.Out.Info("  Repo...........: %s\n", *repo.FullName)
+								sess.Out.Info("  Message........: %s\n", core.TruncateString(finding.CommitMessage, 100))
+								sess.Out.Info("  Author.........: %s\n", finding.CommitAuthor)
 								if finding.Comment != "" {
-									sess.Out.Info("  Comment....: %s\n", finding.Comment)
+									sess.Out.Info("  Comment........: %s\n", finding.Comment)
 								}
-								sess.Out.Info("  File URL...: %s\n", finding.FileUrl)
-								sess.Out.Info("  Commit URL.: %s\n", finding.CommitUrl)
+								sess.Out.Info("  File URL.......: %s\n", finding.FileUrl)
+								sess.Out.Info("  Commit URL.....: %s\n", finding.CommitUrl)
+								sess.Out.Info("  Content Issues.: %d\n", len(signature.Matches()))
+								sess.Out.Info("  Line Numbers...: %s\n", lineNums)
 								sess.Out.Info(" ------------------------------------------------\n\n")
 								sess.Stats.IncrementFindings()
 								break

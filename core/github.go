@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/go-github/github"
+	// "github.com/google/go-github/github"
+	"github.com/google/go-github/v28/github"
 )
 
 type GithubOwner struct {
@@ -54,12 +55,18 @@ func GetUserOrOrganization(login string, client *github.Client) (*GithubOwner, e
 	}, nil
 }
 
-func GetRepositoriesFromOwner(login *string, client *github.Client, filter string) ([]*GithubRepository, error) {
+func GetRepositoriesFromOwner(login *string, client *github.Client) ([]*GithubRepository, error) {
 	var allRepos []*GithubRepository
 	loginVal := *login
 	ctx := context.Background()
+	// listopt := &github.ListOptions{
+	// 	PerPage: 50,
+	// }
+	fmt.Println("Super Secret Squirl")
 	opt := &github.RepositoryListOptions{
-		Type: "sources",
+		// Type: "sources",
+		Visibility: "private",
+		// ListOptions: *listopt,
 	}
 
 	for {
@@ -67,7 +74,6 @@ func GetRepositoriesFromOwner(login *string, client *github.Client, filter strin
 		if err != nil {
 			return allRepos, err
 		}
-		fmt.Println("Found repos:", len(repos))
 		for _, repo := range repos {
 			if !*repo.Fork {
 				r := GithubRepository{
