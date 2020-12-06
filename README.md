@@ -4,7 +4,7 @@
 <br />
 <br />
 <br />
-
+   
 # Gitrob: Putting the Open Source in OSINT
 
 Gitrob is a tool to help find potentially sensitive files pushed to public repositories on Github. Gitrob will clone repositories belonging to a user or organization down to a configurable depth and iterate through the commit history and flag files that match signatures for potentially sensitive files. The findings will be presented through a web interface for easy browsing and analysis.
@@ -71,3 +71,4 @@ Gitrob will need a Github access token in order to interact with the Github API.
     export GITROB_ACCESS_TOKEN=deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
 
 Alternatively you can specify the access token with the `-github-access-token` option, but watch out for your command history!
+ 
